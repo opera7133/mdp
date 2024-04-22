@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model answer {
+  id          String    @id @db.Char(26)
+  user_id     String    @db.Char(28)
+  question_id String    @db.Char(26)
+  title       String    @db.TinyText
+  body        String    @db.MediumText
+  questions   questions @relation(fields: [question_id], references: [id], map: "answer_ibfk_1")
+
+  @@index([question_id], map: "question_id")
+}
+
+model blog {
+  id           String         @id @db.Char(26)
+  user_id      String         @db.Char(28)
+  title        String         @db.TinyText
+  body         String         @db.MediumText
+  score        Int
+  blog_tag_map blog_tag_map[]
+}
+
+model blog_likes {
+  id      String @id @db.Char(26)
+  blog_id String @db.Char(26)
+  user_id String @db.Char(28)
+}
+
+model blog_tag_map {
+  id        String    @id @db.Char(26)
+  blog_id   String    @db.Char(26)
+  tag_id    String    @db.Char(26)
+  blog      blog      @relation(fields: [blog_id], references: [id], map: "blog_tag_map_ibfk_1")
+  blog_tags blog_tags @relation(fields: [tag_id], references: [id], map: "blog_tag_map_ibfk_2")
+
+  @@index([blog_id], map: "blog_id")
+  @@index([tag_id], map: "tag_id")
+}
+
+model blog_tags {
+  id           String         @id @db.Char(26)
+  name         String         @db.Text
+  blog_tag_map blog_tag_map[]
+}
+
+model question_likes {
+  id          String    @id @db.Char(26)
+  question_id String    @db.Char(26)
+  user_id     String    @db.Char(28)
+  likes       Int
+  questions   questions @relation(fields: [question_id], references: [id], map: "question_likes_ibfk_1")
+
+  @@index([question_id], map: "question_id")
+}
+
+model question_tag_map {
+  id            String        @id @db.Char(26)
+  question_id   String        @db.Char(26)
+  tag_id        String        @db.Char(26)
+  questions     questions     @relation(fields: [question_id], references: [id], map: "question_tag_map_ibfk_1")
+  question_tags question_tags @relation(fields: [tag_id], references: [id], map: "question_tag_map_ibfk_2")
+
+  @@index([question_id], map: "question_id")
+  @@index([tag_id], map: "tag_id")
+}
+
+model question_tags {
+  id               String             @id @db.Char(26)
+  name             String             @db.TinyText
+  question_tag_map question_tag_map[]
+}
+
+model questions {
+  id               String             @id @db.Char(26)
+  user_id          String             @db.Char(28)
+  title            String             @db.TinyText
+  body             String             @db.MediumText
+  score            Int
+  answer           answer[]
+  question_likes   question_likes[]
+  question_tag_map question_tag_map[]
+}
